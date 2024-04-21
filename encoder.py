@@ -1,6 +1,5 @@
 import argparse
 import os
-import math
 import numpy as np
 from utils import *
 from scipy import fftpack
