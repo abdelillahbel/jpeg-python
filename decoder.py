@@ -1,9 +1,11 @@
 import argparse
 import math
 import numpy as np
-from utils import *
 from scipy import fftpack
 from PIL import Image
+from utils import binstr_flip, load_quantization_table, zigzag_points
+
+
 
 
 class JPEGFileReader:
@@ -18,7 +20,7 @@ class JPEGFileReader:
     SIZE_BITS = 4
 
     def __init__(self, filepath):
-        self.__file = open(filepath, 'r')
+        self.__file = open(filepath, 'r', encoding='utf-8')
 
     def read_int(self, size):
         if size == 0:
@@ -176,7 +178,17 @@ def main():
             quant_matrix = zigzag_to_block(zigzag)
             dct_matrix = dequantize(quant_matrix, 'lum' if c == 0 else 'chrom')
             block = idct_2d(dct_matrix)
+            
+            # Get the dimensions of npmat
+            height, width, _ = npmat.shape
+            
+            # Ensure i and j don't go beyond the dimensions of npmat
+            i = min(i, height - 8)
+            j = min(j, width - 8)
+            
+            # Now this should work
             npmat[i:i+8, j:j+8, c] = block + 128
+           # npmat[i:i+8, j:j+8, c] = block + 128
 
     image = Image.fromarray(npmat, 'YCbCr')
     image = image.convert('RGB')
